@@ -344,30 +344,29 @@ var DEFAULT_DATA = {
   },
   biz:{
     multipliers:'个人 ×1 ／ 商用 ×2 ／ 买断 ×3 ｜ 加急 ×1.5',
-    styleTags:[
-      {name:'宫廷华丽',desc:'三拍子 + 萨克斯 + 华贵氛围'},
-      {name:'日常惬意',desc:'Groove 律动 + 贝斯，绝区零 / GalGame 日常感'}
-    ],
     categories:[
-      {num:'01',name:'编曲类',desc:'写旋律、编配器，做出一首从零开始的曲子。',note:'更多风格陆续开放。',audioText:'试听纯音乐 demo →',
+      {num:'01',name:'编曲类',desc:'写旋律、编配器，做出一首从零开始的曲子。',note:'更多风格陆续开放。',audioText:'试听纯音乐 demo →',styleTags:[
+        {name:'宫廷华丽',desc:'三拍子 + 萨克斯 + 华贵氛围'},
+        {name:'日常惬意',desc:'Groove 律动 + 贝斯，绝区零 / GalGame 日常感'}
+      ],
        items:[
         {name:'纯音乐定制（两轨基准）',price:'1 分钟内 30 元',meta:'超 1 分钟：每 10 秒 +10 元（零头不计，不满 1 分钟按 1 分钟计）｜ 授权：个人 ×1 ／ 商用 ×2 ／ 买断 ×3 ｜ 加急 ×1.5 ｜ 工期一周内 ｜ 修改 3 次 ｜ 定金 50%'},
         {name:'纯音乐定制（三轨及以上）',price:'价格待定',meta:'可加配器（如吉他），由浠洙根据曲风决定｜暂缓开放'},
         {name:'歌曲定制',price:'编曲底价 + 演唱费',meta:'演唱费：原创 100 元／分钟，翻唱 50 元／分钟（推定待确认）｜ 版本：浠洙演唱版 ／ 仅主旋律版 ｜ 歌姬暂不提供'},
         {name:'大定制（OC 曲 · 大编制）',price:'面议 · 预留',meta:'手艺进阶后开放，价格与工期届时填写'}
        ]},
-      {num:'02',name:'演唱类',desc:'替你把歌唱掉，交付干声；也可以顺手做粗混。',note:'嗓音：男声偏中性，音域较广，日系 / 燃曲 / 英文皆可，韩语不接。',audioText:'试听代唱案例 →',
+      {num:'02',name:'演唱类',desc:'替你把歌唱掉，交付干声；也可以顺手做粗混。',note:'嗓音：男声偏中性，音域较广，日系 / 燃曲 / 英文皆可，韩语不接。',audioText:'试听代唱案例 →',styleTags:[],
        items:[
         {name:'代唱 · 翻唱',price:'50 元／分钟',meta:'尾数不满一分钟不计 ｜ 交付干声，含粗混 +30–60 元 ｜ 工期 1 周（含粗混 2 周）｜ 修改 3 次 ｜ 定金 50%'},
         {name:'代唱 · 原创',price:'100 元／分钟',meta:'尾数不满一分钟不计 ｜ 交付干声，含粗混 +30–60 元 ｜ 工期 1 周（含粗混 2 周）｜ 修改 3 次 ｜ 定金 50%'}
        ]},
-      {num:'03',name:'混音类',desc:'把声音收拾干净：修音、贴唱粗混，精混与母带筹备中。',note:'',audioText:'试听混音案例 →',
+      {num:'03',name:'混音类',desc:'把声音收拾干净：修音、贴唱粗混，精混与母带筹备中。',note:'',audioText:'试听混音案例 →',styleTags:[],
        items:[
         {name:'纯修音',price:'半首 15 ／ 整首 30 元',meta:'3 天内交付 ｜ 修改 3 次 ｜ 定金 50% ｜ 客户交干声，修好回发'},
         {name:'贴唱粗混',price:'30–60 元／首',meta:'含基础修音 + 轻压缩 + EQ + 混响 + 人声融伴奏 ｜ 工期 1 周 ｜ 修改 3 次 ｜ 定金 50%'},
         {name:'精混 + 母带',price:'预留',meta:'学成后定价开放，暂不接单'}
        ]},
-      {num:'04',name:'演出类',desc:'线下商演，站上台把歌唱给你听。',note:'商演现场视频暂不放，翻唱作品足以证唱功。',audioText:'',
+      {num:'04',name:'演出类',desc:'线下商演，站上台把歌唱给你听。',note:'商演现场视频暂不放，翻唱作品足以证唱功。',audioText:'',styleTags:[],
        items:[
         {name:'商演 · 单人',price:'潍坊 50–100 元／首',meta:'省外 100–200 元／首，差旅必包 ｜ 档期：周末 / 节假日（工作日夜间不可）｜ 无定金，演后结款'},
         {name:'商演 · 带乐队',price:'乐队费 + 差旅另计',meta:'档期同上 ｜ 无定金，演后结款'}
@@ -543,18 +542,18 @@ function renderHome(){
 
 function renderBiz(){
   var b = data.biz;
-  var styleHtml = (b.styleTags||[]).map(function(t){
-    return '<b>'+esc(t.name)+'</b>'+(t.desc ? '（'+esc(t.desc)+'）' : '');
-  }).join('・');
   var cats = b.categories.map(function(c, ci){
     var items = c.items.map(function(it){
       return '<li><span class="biz-name">'+esc(it.name)+'</span>' +
         '<span class="biz-price">'+esc(it.price)+'</span>' +
         '<span class="biz-meta">'+esc(it.meta)+'</span></li>';
     }).join('');
+    var styleHtml = (c.styleTags||[]).map(function(t){
+      return '<b>'+esc(t.name)+'</b>'+(t.desc ? '（'+esc(t.desc)+'）' : '');
+    }).join('・');
     var note = '';
     if(c.note) note += '<p class="note">'+esc(c.note)+'</p>';
-    if(ci === 0 && styleHtml) note += '<p class="note">风格参考：'+styleHtml+'</p>';
+    if(styleHtml) note += '<p class="note">风格参考：'+styleHtml+'</p>';
     var audio = c.audioText ? '<button class="biz-audio" data-goto="audio">'+esc(c.audioText)+'</button>' : '';
     return '<div class="biz">' +
       '<div class="biz-head"><span class="num">'+esc(c.num)+'</span><h3>'+esc(c.name)+'</h3></div>' +
@@ -899,9 +898,9 @@ function buildEditor(){
   html += edText('home.tags','首页标签（中文逗号分隔，如：编曲,演唱,混音）');
   html += '</div></div>';
 
-  html += '<div class="ed-panel"><div class="ed-p-title">授权乘数与风格标签<span class="hint">你自己编辑</span></div><div class="ed-body">';
+  html += '<div class="ed-panel"><div class="ed-p-title">授权乘数<span class="hint">你自己编辑</span></div><div class="ed-body">';
   html += edText('biz.multipliers','授权乘数文案');
-  html += '<div class="ed-row"><label>风格标签（打 tag）</label><div id="tagList"></div><button class="ed-add" data-add="tag">+ 添加标签</button></div>';
+  html += '<p class="ed-note">风格标签已挪到下面的「业务与价目」里 —— 每个业务大类各有自己的一套，编曲、歌曲定制等可分别添加。</p>';
   html += '</div></div>';
 
   html += '<div class="ed-panel"><div class="ed-p-title">业务与价目<span class="hint">增删条目、改价格/工期/备注</span></div><div class="ed-body"><div id="catList"></div><button class="ed-add" data-add="cat">+ 添加业务大类</button></div></div>';
@@ -982,7 +981,7 @@ function buildEditor(){
     else if(act === 'export') exportSite();
     else if(act === 'reset'){ if(confirm('恢复默认会清空所有编辑内容，确定？')) resetData(); }
     else if(act === 'preview') switchView('home');
-    else if(add === 'tag'){ draft.biz.styleTags.push({name:'新标签',desc:''}); renderTagList(); }
+    else if(add === 'ctag'){ var cTags = draft.biz.categories[+ci].styleTags || (draft.biz.categories[+ci].styleTags = []); cTags.push({name:'新标签',desc:''}); renderCatList(); }
     else if(add === 'cat'){ draft.biz.categories.push({num:'0' + (draft.biz.categories.length+1), name:'新大类', desc:'', note:'', audioText:'', items:[{name:'服务项', price:'价格', meta:'说明'}]}); renderCatList(); }
     else if(add === 'item'){ var catArr = getPath(draft, 'biz.categories'); if(catArr && ci != null) catArr[+ci].items.push({name:'新服务', price:'价格', meta:''}); renderCatList(); }
     else if(add === 'audio'){ draft.audio.push({name:'新曲目', cat:'分类', media:null}); renderAudList(); }
@@ -996,26 +995,13 @@ function buildEditor(){
     }
   });
 
-  renderTagList(); renderCatList(); renderAudList(); renderWorkList(); renderConList();
+  renderCatList(); renderAudList(); renderWorkList(); renderConList();
   fillMedia(root);
 }
 
 function refreshEdLists(){
-  renderTagList(); renderCatList(); renderAudList(); renderWorkList(); renderConList();
+  renderCatList(); renderAudList(); renderWorkList(); renderConList();
   fillMedia(document.getElementById('editRoot'));
-}
-
-function renderTagList(){
-  var box = document.getElementById('tagList');
-  if(!box) return;
-  var tags = draft.biz.styleTags || [];
-  box.innerHTML = tags.map(function(t,i){
-    return '<div class="ed-item">' +
-      '<div class="ed-row"><input type="text" data-path="biz.styleTags.' + i + '.name" value="' + esc(t.name) + '" placeholder="标签名"></div>' +
-      '<div class="ed-row"><input type="text" data-path="biz.styleTags.' + i + '.desc" value="' + esc(t.desc||'') + '" placeholder="说明（可空）"></div>' +
-      '<div class="ed-item-actions"><button class="ed-del" data-del="biz.styleTags|' + i + '">删除</button></div>' +
-    '</div>';
-  }).join('');
 }
 
 function renderCatList(){
@@ -1031,6 +1017,13 @@ function renderCatList(){
         '<div class="ed-item-actions"><button class="ed-del" data-del="biz.categories.' + ci + '.items|' + ii + '">删除</button></div>' +
       '</div>';
     }).join('');
+    var tagsHtml = (c.styleTags||[]).map(function(tg,ti){
+      return '<div class="ed-item">' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.styleTags.' + ti + '.name" value="' + esc(tg.name) + '" placeholder="标签名，如：宫廷华丽"></div>' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.styleTags.' + ti + '.desc" value="' + esc(tg.desc||'') + '" placeholder="说明（可空）"></div>' +
+        '<div class="ed-item-actions"><button class="ed-del" data-del="biz.categories.' + ci + '.styleTags|' + ti + '">删除</button></div>' +
+      '</div>';
+    }).join('');
     return '<div class="ed-item">' +
       '<div style="display:grid;grid-template-columns:44px 1fr 1fr;gap:8px">' +
         '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.num" value="' + esc(c.num) + '" placeholder="01"></div>' +
@@ -1039,6 +1032,8 @@ function renderCatList(){
       '</div>' +
       '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.desc" value="' + esc(c.desc) + '" placeholder="一句话描述"></div>' +
       '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.note" value="' + esc(c.note||'') + '" placeholder="底部备注（可空）"></div>' +
+      '<div class="ed-row"><label>风格标签（这个业务专属，可分别添加）</label>' + tagsHtml +
+      '<button class="ed-add" data-add="ctag" data-ci="' + ci + '">+ 添加标签</button></div>' +
       itemsHtml +
       '<button class="ed-add" data-add="item" data-ci="' + ci + '">+ 添加服务项</button>' +
       '<div class="ed-item-actions"><button class="ed-del" data-del="biz.categories|' + ci + '">删除整个大类</button></div>' +
@@ -1143,7 +1138,18 @@ function exportSite(){
 }
 
 /* ================= 启动 ================= */
-var data = loadData();
+function migrateData(d){
+  if(d && d.biz){
+    if(d.biz.styleTags && d.biz.categories && d.biz.categories.length){
+      if(!d.biz.categories[0].styleTags) d.biz.categories[0].styleTags = [];
+      (d.biz.styleTags||[]).forEach(function(t){ d.biz.categories[0].styleTags.push(t); });
+      delete d.biz.styleTags;
+    }
+    (d.biz.categories||[]).forEach(function(c){ if(!c.styleTags) c.styleTags = []; });
+  }
+  return d;
+}
+var data = migrateData(loadData());
 renderAll();
 
 var menuBtn = document.getElementById('menuBtn');
