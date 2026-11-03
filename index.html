@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="keywords" content="浠洙,OC曲定制,印象曲,编曲,代唱,混音,商演">
+<title>浠洙 · 为你的 OC 定制一首歌</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23F4F1EC'/%3E%3Ctext x='32' y='44' font-size='36' text-anchor='middle' fill='%231a1a1a' font-family='serif'%3E浠%3C/text%3E%3Ccircle cx='48' cy='16' r='4' fill='%23C97B4A'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#F4F1EC; --ink:#1a1a1a; --ink2:#3a3a3a; --ink3:#6b6b6b; --ink4:#9a9a9a;
+    --accent:#C97B4A; --line:#E3DDD2;
+    --serif:'Songti SC','STSong','Noto Serif CJK SC','Source Han Serif SC','SimSun',serif;
+    --sans:-apple-system,'Helvetica Neue','PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;line-height:1.7}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+  input,textarea{font-family:inherit;color:inherit}
+
+  /* ===== 顶部栏 ===== */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:50;height:60px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px;background:rgba(244,241,236,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{font-size:18px;letter-spacing:.35em;font-weight:600;user-select:none}
+  .nav{display:none;gap:34px;font-family:var(--sans);font-size:13px;letter-spacing:.2em;color:var(--ink3)}
+  .nav a{padding:6px 0;position:relative}
+  .nav a:hover,.nav a.active{color:var(--ink)}
+  .nav a.active::after{content:'';position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--accent)}
+  .menu-btn{width:44px;height:44px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:6px;padding-right:6px}
+  .menu-btn span{display:block;width:24px;height:1px;background:var(--ink);transition:.2s}
+  .menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .menu-btn.open span:nth-child(2){transform:translateY(-7px) rotate(-45deg)}
+  .drawer{
+    position:fixed;top:60px;left:0;right:0;z-index:49;background:var(--paper);
+    border-bottom:1px solid var(--line);padding:12px 20px 20px;display:none;
+    font-family:var(--sans);font-size:15px;letter-spacing:.15em;
+  }
+  .drawer.open{display:block}
+  .drawer a{display:block;padding:14px 0;border-bottom:1px solid var(--line);color:var(--ink2)}
+  .drawer a:last-child{border-bottom:none}
+  .drawer a.active{color:var(--accent)}
+
+  /* ===== 视图 ===== */
+  .view{display:none;padding:60px 0 0;min-height:100vh}
+  .view.active{display:block;animation:fadeIn .35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+  /* ===== 首页 ===== */
+  .hero{position:relative;padding:96px 0 40px;min-height:calc(100vh - 60px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+  .hero-cn{max-width:640px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-bottom:34px}
+  .hero h1{font-size:46px;line-height:1.1;letter-spacing:.08em;font-weight:600}
+  .hero .sub{font-size:19px;letter-spacing:.18em;color:var(--ink3);margin-top:18px;font-family:var(--sans);font-weight:400}
+  .rule{width:44px;height:1px;background:var(--accent);margin:30px 0}
+  .hero p.intro{font-size:16px;line-height:2.1;letter-spacing:.04em;color:var(--ink2);max-width:540px}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:38px}
+  .cta{
+    font-family:var(--sans);font-size:14px;letter-spacing:.18em;padding:12px 26px;
+    border:1px solid var(--ink);transition:.18s;
+  }
+  .cta.solid{background:var(--ink);color:var(--paper)}
+  .cta:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+  .tate{
+    writing-mode:vertical-rl;position:absolute;right:14px;top:104px;
+    font-size:10px;letter-spacing:.5em;color:var(--ink4);font-family:var(--sans);
+  }
+  .tate .t-accent{color:var(--accent)}
+  .home-tags{
+    width:100%;
+    border-top:1px solid var(--line);margin-top:56px;padding-top:22px;
+    display:flex;flex-wrap:wrap;gap:10px 22px;
+    font-family:var(--sans);font-size:12px;letter-spacing:.3em;color:var(--ink4);
+  }
+
+  /* ===== 通用页头 ===== */
+  .page-head{padding:84px 0 8px}
+  .page-head h2{font-size:34px;letter-spacing:.14em;font-weight:600}
+  .page-head .en{font-family:var(--sans);font-size:12px;letter-spacing:.5em;color:var(--ink4);margin-top:8px}
+  .page-head .rule{width:44px;height:1px;background:var(--accent);margin:24px 0 0}
+
+  /* ===== 业务页 ===== */
+  .biz{display:flex;flex-direction:column;padding:56px 0 20px}
+  .biz + .biz{border-top:1px solid var(--line);margin-top:40px}
+  .biz .biz-head{display:flex;align-items:baseline;gap:16px}
+  .biz .num{font-family:var(--sans);font-size:12px;letter-spacing:.2em;color:var(--accent)}
+  .biz h3{font-size:26px;letter-spacing:.1em;font-weight:600}
+  .biz .desc{font-size:14px;color:var(--ink3);margin-top:4px}
+  .biz-list{list-style:none;margin-top:20px}
+  .biz-list li{
+    padding:16px 0;border-top:1px dashed var(--line);
+    display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;align-items:baseline;
+  }
+  .biz-list li:first-child{border-top:none}
+  .biz-name{font-size:16px;font-weight:600;letter-spacing:.05em}
+  .biz-price{font-family:var(--sans);font-size:14px;color:var(--ink);letter-spacing:.04em;white-space:nowrap}
+  .biz-meta{width:100%;font-family:var(--sans);font-size:12px;color:var(--ink4);letter-spacing:.06em;line-height:1.9}
+  .biz .note{font-size:13px;color:var(--ink3);margin-top:14px;font-family:var(--sans);letter-spacing:.04em}
+  .biz .note b{color:var(--accent);font-weight:600}
+  .biz-audio{margin-top:6px;font-family:var(--sans);font-size:12px;letter-spacing:.15em;color:var(--accent);padding:8px 0}
+
+  /* ===== 试听页 ===== */
+  .player{
+    margin:40px 0 24px;padding:22px;border:1px solid var(--line);background:#FBFAF6;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .p-btn{
+    width:52px;height:52px;border-radius:50%;border:1px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;transition:.18s;flex-shrink:0;
+  }
+  .p-btn:hover{background:var(--ink);color:var(--paper)}
+  .p-btn svg{width:16px;height:16px;fill:currentColor}
+  .p-info{flex:1;min-width:140px}
+  .p-title{font-size:16px;font-weight:600;letter-spacing:.06em}
+  .p-sub{font-family:var(--sans);font-size:12px;color:var(--ink4);letter-spacing:.08em;margin-top:2px}
+  .p-bar{flex-basis:100%;height:1px;background:var(--line);position:relative;cursor:pointer}
+  .p-bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent)}
+  .p-bar .knob{position:absolute;left:0;top:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .p-time{font-family:var(--sans);font-size:12px;color:var(--ink4);letter-spacing:.1em}
+  .audio-list{list-style:none;margin:8px 0 48px}
+  .audio-list li{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:16px 4px;border-bottom:1px solid var(--line);
+  }
+  .audio-list li:last-child{border-bottom:none}
+  .audio-name{font-size:15px;letter-spacing:.05em}
+  .audio-cat{font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--ink4);margin-top:2px}
+  .audio-play{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--ink3);transition:.15s;flex-shrink:0}
+  .audio-play:hover{color:var(--accent)}
+  .audio-play svg{width:14px;height:14px;fill:currentColor}
+  .soon{font-family:var(--sans);font-size:12px;letter-spacing:.15em;color:var(--ink4);border:1px solid var(--line);padding:14px 18px;margin:32px 0 56px}
+
+  /* ===== 关于我：标签页 ===== */
+  .about-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:36px 0 0;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .about-tabs button{
+    font-family:var(--sans);font-size:13px;letter-spacing:.18em;color:var(--ink3);
+    padding:8px 18px;border:1px solid var(--line);transition:.15s;
+  }
+  .about-tabs button:hover{color:var(--ink);border-color:var(--ink)}
+  .about-tabs button.active{color:var(--paper);background:var(--ink);border-color:var(--ink)}
+  .about-panel{display:none;padding:40px 0 12px}
+  .about-panel.active{display:block;animation:fadeIn .3s ease}
+  .about-panel h3{font-size:20px;letter-spacing:.16em;font-weight:600;display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .about-panel h3::before{content:'';width:8px;height:8px;background:var(--accent);display:inline-block;flex-shrink:0}
+  .about-panel .body{font-size:14px;color:var(--ink3);line-height:2}
+
+  /* OC 封面背景（网易云个人主页式） */
+  .oc-cover{height:200px;background:#EDE7DD center/cover no-repeat;border:1px solid var(--line);position:relative;margin-bottom:28px}
+  .oc-cover .oc-place{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:12px;letter-spacing:.3em;color:var(--ink4)}
+
+  /* 作品集封面 */
+  .pf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}
+  .pf-card{border:1px solid var(--line);background:#FBFAF6}
+  .pf-cover{aspect-ratio:3/2;background:#EDE7DD center/cover no-repeat;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .pf-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .pf-cover .pf-text{font-family:var(--serif);font-size:20px;letter-spacing:.2em;color:var(--ink);text-align:center;padding:14px}
+  .pf-name{font-family:var(--sans);font-size:12px;letter-spacing:.15em;color:var(--ink3);padding:12px 14px;border-top:1px solid var(--line)}
+
+  /* 联系方式卡片 */
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-top:18px}
+  .contact-card{border:1px solid var(--line);background:#FBFAF6;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+  .contact-card .qr{width:120px;height:120px;background:#EDE7DD center/contain no-repeat;border:1px solid var(--line)}
+  .contact-card .qr img{width:100%;height:100%;object-fit:contain;display:block}
+  .contact-card .qr-none{display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:10px;letter-spacing:.2em;color:var(--ink4)}
+  .contact-card .c-name{font-size:15px;letter-spacing:.12em;font-weight:600}
+  .contact-card .c-desc{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--ink4);line-height:1.8}
+
+  /* Obsidian 风 MD 渲染 */
+  .md-body{font-size:14px;line-height:2;color:var(--ink2)}
+  .md-body h1,.md-body h2,.md-body h3{color:var(--ink);font-weight:600;letter-spacing:.06em;line-height:1.4}
+  .md-body h1{font-size:22px;margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .md-body h2{font-size:19px;margin:24px 0 10px}
+  .md-body h3{font-size:16px;margin:20px 0 8px}
+  .md-body p{margin:10px 0}
+  .md-body ul,.md-body ol{margin:10px 0 10px 1.4em}
+  .md-body li{margin:5px 0}
+  .md-body blockquote{border-left:3px solid var(--accent);background:#FBFAF6;padding:10px 16px;margin:14px 0;color:var(--ink3)}
+  .md-body code{font-family:Consolas,monospace;font-size:12px;background:#EDE7DD;padding:2px 6px}
+  .md-body pre{background:#EDE7DD;padding:14px 16px;margin:14px 0;overflow-x:auto;border:1px solid var(--line)}
+  .md-body pre code{background:none;padding:0}
+  .md-body hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+  .md-body a{color:var(--accent);text-decoration:underline}
+
+  /* ===== 页脚 ===== */
+  footer{
+    border-top:1px solid var(--line);padding:32px 24px 40px;margin-top:48px;
+    display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;
+    font-family:var(--sans);font-size:12px;letter-spacing:.12em;color:var(--ink4);
+  }
+  .to-top,.admin-btn{padding:10px 14px;border:1px solid var(--line);letter-spacing:.2em;transition:.18s}
+  .to-top:hover,.admin-btn:hover{color:var(--ink);border-color:var(--ink)}
+
+  /* ===== Toast ===== */
+  #toast{
+    position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);font-family:var(--sans);
+    font-size:13px;letter-spacing:.1em;padding:12px 24px;opacity:0;pointer-events:none;
+    transition:.28s;z-index:99;max-width:86vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===== 编辑后台 ===== */
+  .ed-wrap{max-width:860px;margin:0 auto;padding:0 24px 80px}
+  .ed-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:30px 0 6px;border-bottom:1px solid var(--line);margin-bottom:26px}
+  .ed-head h2{font-size:22px;letter-spacing:.14em;font-weight:600}
+  .ed-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .ed-btn{font-family:var(--sans);font-size:13px;letter-spacing:.12em;padding:10px 18px;border:1px solid var(--ink);transition:.15s}
+  .ed-btn.solid{background:var(--ink);color:var(--paper)}
+  .ed-btn:hover{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+  .ed-panel{border:1px solid var(--line);margin-bottom:22px;background:#FBFAF6}
+  .ed-panel > .ed-p-title{padding:14px 18px;font-family:var(--sans);font-size:13px;letter-spacing:.2em;color:var(--ink);border-bottom:1px solid var(--line);background:#F0EBE2;display:flex;justify-content:space-between;align-items:center}
+  .ed-panel > .ed-p-title .hint{font-size:11px;color:var(--ink4);letter-spacing:.08em}
+  .ed-body{padding:16px 18px}
+  .ed-row{margin-bottom:14px}
+  .ed-row label{display:block;font-family:var(--sans);font-size:11px;letter-spacing:.15em;color:var(--ink3);margin-bottom:6px}
+  .ed-row input[type=text],.ed-row textarea{
+    width:100%;background:#fff;border:1px solid var(--line);padding:10px 12px;
+    font-size:13px;letter-spacing:.03em;line-height:1.6;
+  }
+  .ed-row textarea{min-height:80px;resize:vertical}
+  .ed-item{border:1px dashed var(--line);padding:12px;margin-bottom:10px;background:#fff}
+  .ed-item .ed-row{margin-bottom:8px}
+  .ed-item-actions{display:flex;gap:8px;margin-top:6px}
+  .ed-del{font-family:var(--sans);font-size:11px;letter-spacing:.1em;color:var(--ink4);border:1px solid var(--line);padding:6px 12px}
+  .ed-del:hover{color:#a33;border-color:#a33}
+  .ed-file{font-family:var(--sans);font-size:12px;color:var(--ink3)}
+  .ed-file input{font-size:12px;margin-top:4px}
+  .ed-file .fname{color:var(--accent);font-size:12px;margin-left:8px}
+  .ed-file img.thumb{max-width:120px;max-height:90px;display:block;margin-top:8px;border:1px solid var(--line)}
+  .ed-add{font-family:var(--sans);font-size:12px;letter-spacing:.12em;padding:8px 16px;border:1px solid var(--ink);margin-top:4px}
+  .ed-add:hover{background:var(--ink);color:var(--paper)}
+  .ed-note{font-family:var(--sans);font-size:11px;color:var(--ink4);letter-spacing:.05em;line-height:1.8}
+  .ed-hint-tip{font-family:var(--sans);font-size:12px;color:var(--ink4);letter-spacing:.04em;padding:0 2px 16px;line-height:1.9}
+
+  /* 编辑锁屏 */
+  #editLock{
+    position:fixed;inset:0;z-index:120;background:rgba(244,241,236,.97);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  }
+  #editLock.hidden{display:none}
+  #editLock .lk-box{border:1px solid var(--line);background:#FBFAF6;padding:34px 40px;max-width:92vw;width:340px}
+  #editLock h3{font-size:17px;letter-spacing:.18em;font-weight:600;margin-bottom:6px}
+  #editLock p{font-family:var(--sans);font-size:12px;color:var(--ink4);letter-spacing:.05em;margin-bottom:16px;line-height:1.8}
+  #editLock input[type=password]{width:100%;background:#fff;border:1px solid var(--line);padding:10px 12px;font-size:14px;margin-bottom:12px}
+  #editLock .lk-btn{width:100%;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:13px;letter-spacing:.18em;padding:11px 0}
+
+  /* ===== 桌面端 ===== */
+  @media (min-width:768px){
+    .topbar{height:72px;padding:0 56px}
+    .logo{font-size:20px}
+    .nav{display:flex}
+    .menu-btn{display:none}
+    .drawer{display:none!important}
+    .wrap{padding:0 56px}
+    .hero{padding:120px 0 60px}
+    .hero h1{font-size:56px}
+    .hero .sub{font-size:19px}
+    .hero p.intro{font-size:16px}
+    .tate{display:block;right:24px;top:50%;transform:translateY(-50%);font-size:12px}
+    .page-head{padding:110px 0 8px}
+    .page-head h2{font-size:36px}
+    .wrap{padding:0 40px}
+    .topbar{padding:0 40px}
+    .biz h3{font-size:30px}
+    .player{padding:26px 28px}
+    .oc-cover{height:240px}
+    .pf-grid{grid-template-columns:repeat(3,1fr)}
+    .ed-wrap{padding:0 40px 100px}
+  }
+  @media (min-width:1200px){
+    .wrap{max-width:1160px}
+    .hero h1{font-size:88px}
+    .hero .sub{font-size:22px}
+    .page-head h2{font-size:44px}
+    .tate{right:34px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部栏 ===== -->
+<header class="topbar">
+  <div class="logo" id="logoBtn">浠洙</div>
+  <nav class="nav" id="nav"></nav>
+  <button class="menu-btn" id="menuBtn" aria-label="菜单"><span></span><span></span></button>
+</header>
+<nav class="drawer" id="drawer"></nav>
+
+<!-- ===== 首页 ===== -->
+<section class="view active" id="view-home">
+  <div class="wrap hero" id="homeWrap"></div>
+</section>
+
+<!-- ===== 其他业务 ===== -->
+<section class="view" id="view-business">
+  <div class="wrap" id="bizWrap"></div>
+</section>
+
+<!-- ===== 音频试听 ===== -->
+<section class="view" id="view-audio">
+  <div class="wrap" id="audioWrap"></div>
+</section>
+
+<!-- ===== 关于我 ===== -->
+<section class="view" id="view-about">
+  <div class="wrap" id="aboutWrap"></div>
+</section>
+
+<!-- ===== 编辑后台 ===== -->
+<section class="view" id="view-edit">
+  <div id="editRoot"></div>
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer id="footerEl"></footer>
+
+<div id="toast" role="status"></div>
+<div id="editLock" class="hidden"></div>
+
+<script>window.__EDIT_DISABLED=true;</script>
+<script data-main>
+(function(){
+'use strict';
+var LS_KEY='xishu_data_v1', PASS_KEY='xishu_pass_v1', AUTH_SESS='xishu_auth_ok';
+var EDIT_DISABLED = window.__EDIT_DISABLED === true;
+var SITE_TITLE_TPL = '浠洙 · 为你的 OC 定制一首歌';
+
+/* ================= 默认数据（与方案底稿一致） ================= */
+var DEFAULT_DATA = {
+  home:{
+    title:'浠洙',
+    sub:'为你的 OC，定制一首歌',
+    intro:'你好，我是浠洙。<br>一个写歌的、唱歌的，偶尔也替人把声音收拾干净。<br>平时主要给 OC 写印象曲，也接场景配乐、代唱、混音和线下商演。<br>声音偏中性，音域还算宽——日系、燃曲、英文歌都能唱，韩语不碰。<br>想听我写过什么、唱过什么，往下翻试听；想约稿，看业务与价目。',
+    cta1:'看业务与价目',
+    cta2:'去试听',
+    tate:'音楽と、あなたの創作を。',
+    tags:['编曲','演唱','混音','演出','OC 印象曲','商演','声线中性']
+  },
+  biz:{
+    multipliers:'个人 ×1 ／ 商用 ×2 ／ 买断 ×3 ｜ 加急 ×1.5',
+    styleTags:[
+      {name:'宫廷华丽',desc:'三拍子 + 萨克斯 + 华贵氛围'},
+      {name:'日常惬意',desc:'Groove 律动 + 贝斯，绝区零 / GalGame 日常感'}
+    ],
+    categories:[
+      {num:'01',name:'编曲类',desc:'写旋律、编配器，做出一首从零开始的曲子。',note:'更多风格陆续开放。',audioText:'试听纯音乐 demo →',
+       items:[
+        {name:'纯音乐定制（两轨基准）',price:'1 分钟内 30 元',meta:'超 1 分钟：每 10 秒 +10 元（零头不计，不满 1 分钟按 1 分钟计）｜ 授权：个人 ×1 ／ 商用 ×2 ／ 买断 ×3 ｜ 加急 ×1.5 ｜ 工期一周内 ｜ 修改 3 次 ｜ 定金 50%'},
+        {name:'纯音乐定制（三轨及以上）',price:'价格待定',meta:'可加配器（如吉他），由浠洙根据曲风决定｜暂缓开放'},
+        {name:'歌曲定制',price:'编曲底价 + 演唱费',meta:'演唱费：原创 100 元／分钟，翻唱 50 元／分钟（推定待确认）｜ 版本：浠洙演唱版 ／ 仅主旋律版 ｜ 歌姬暂不提供'},
+        {name:'大定制（OC 曲 · 大编制）',price:'面议 · 预留',meta:'手艺进阶后开放，价格与工期届时填写'}
+       ]},
+      {num:'02',name:'演唱类',desc:'替你把歌唱掉，交付干声；也可以顺手做粗混。',note:'嗓音：男声偏中性，音域较广，日系 / 燃曲 / 英文皆可，韩语不接。',audioText:'试听代唱案例 →',
+       items:[
+        {name:'代唱 · 翻唱',price:'50 元／分钟',meta:'尾数不满一分钟不计 ｜ 交付干声，含粗混 +30–60 元 ｜ 工期 1 周（含粗混 2 周）｜ 修改 3 次 ｜ 定金 50%'},
+        {name:'代唱 · 原创',price:'100 元／分钟',meta:'尾数不满一分钟不计 ｜ 交付干声，含粗混 +30–60 元 ｜ 工期 1 周（含粗混 2 周）｜ 修改 3 次 ｜ 定金 50%'}
+       ]},
+      {num:'03',name:'混音类',desc:'把声音收拾干净：修音、贴唱粗混，精混与母带筹备中。',note:'',audioText:'试听混音案例 →',
+       items:[
+        {name:'纯修音',price:'半首 15 ／ 整首 30 元',meta:'3 天内交付 ｜ 修改 3 次 ｜ 定金 50% ｜ 客户交干声，修好回发'},
+        {name:'贴唱粗混',price:'30–60 元／首',meta:'含基础修音 + 轻压缩 + EQ + 混响 + 人声融伴奏 ｜ 工期 1 周 ｜ 修改 3 次 ｜ 定金 50%'},
+        {name:'精混 + 母带',price:'预留',meta:'学成后定价开放，暂不接单'}
+       ]},
+      {num:'04',name:'演出类',desc:'线下商演，站上台把歌唱给你听。',note:'商演现场视频暂不放，翻唱作品足以证唱功。',audioText:'',
+       items:[
+        {name:'商演 · 单人',price:'潍坊 50–100 元／首',meta:'省外 100–200 元／首，差旅必包 ｜ 档期：周末 / 节假日（工作日夜间不可）｜ 无定金，演后结款'},
+        {name:'商演 · 带乐队',price:'乐队费 + 差旅另计',meta:'档期同上 ｜ 无定金，演后结款'}
+       ]}
+    ]
+  },
+  audio:[
+    {name:'纯音乐 demo（两轨样品）',cat:'编曲 · 纯音乐',media:null},
+    {name:'歌曲定制案例',cat:'编曲 · 歌曲（预留）',media:null},
+    {name:'代唱案例（与翻唱同列）',cat:'演唱 · 代唱',media:null},
+    {name:'修音 / 粗混案例',cat:'混音 · 自混自发',media:null},
+    {name:'商演现场',cat:'演出 · 暂无，留位',media:null}
+  ],
+  about:{
+    works:[
+      {title:'作品示例一',coverType:'text',coverText:'作品示例',media:null}
+    ],
+    oc:{cover:null, md:'## OC 设定档案\n\n形象、声线、性格细目待补。\n\n> 编辑后台里可以直接导入 .md 文件，或粘贴 Markdown 文本，这里会以笔记样式排版展示。'},
+    resume:'给甲方与听众看的实力说明，与 OC 分开展示 —— 内容待补。',
+    contact:[
+      {name:'小红书',desc:'主页置顶笔记挂网站链接，约稿可在私信沟通',qr:null},
+      {name:'闲鱼',desc:'交易走平台担保，安全省心',qr:null}
+    ]
+  },
+  footer:{
+    copyright:'© 2026 浠洙',
+    watermark:'声音水印说明待补'
+  }
+};
+
+/* ================= 存储与素材 ================= */
+function loadData(){
+  if(window.__INITIAL_DATA) return JSON.parse(JSON.stringify(window.__INITIAL_DATA));
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(raw){ var d = JSON.parse(raw); if(d && d.home) return d; }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+function saveData(d){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(d)); }catch(e){ toast('保存失败：浏览器存储不可用'); }
+}
+function resetData(){
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  renderAll();
+}
+
+/* IndexedDB 素材库 */
+var db = null;
+function openDB(cb){
+  if(db) return cb();
+  try{
+    var r = indexedDB.open('xishu_media', 1);
+    r.onupgradeneeded = function(e){ e.target.result.createObjectStore('media'); };
+    r.onsuccess = function(){ db = r.result; cb(); };
+    r.onerror = function(){ cb(false); };
+  }catch(e){ cb(false); }
+}
+function putMedia(blob, cb){
+  openDB(function(ok){
+    if(!ok) return cb(null);
+    var id = 'm' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    var tx = db.transaction('media','readwrite');
+    tx.objectStore('media').put(blob, id).onsuccess = function(){ cb(id); };
+  });
+}
+function getMediaBlob(id, cb){
+  openDB(function(ok){
+    if(!ok) return cb(null);
+    var req = db.transaction('media','readonly').objectStore('media').get(id);
+    req.onsuccess = function(){ cb(req.result || null); };
+  });
+}
+function getMediaDataUrl(id, cb){
+  getMediaBlob(id, function(b){
+    if(!b) return cb(null);
+    var fr = new FileReader();
+    fr.onload = function(){ cb(fr.result); };
+    fr.readAsDataURL(b);
+  });
+}
+var urlCache = {};
+function mediaUrl(field, cb){
+  if(!field) return cb(null);
+  if(field.dataUrl) return cb(field.dataUrl);
+  if(urlCache[field.id]) return cb(urlCache[field.id]);
+  getMediaBlob(field.id, function(b){
+    if(!b) return cb(null);
+    var u = URL.createObjectURL(b);
+    urlCache[field.id] = u;
+    cb(u);
+  });
+}
+
+/* ================= 工具 ================= */
+var toastEl = document.getElementById('toast'), toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+}
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fillMedia(scope){
+  scope.querySelectorAll('[data-media]').forEach(function(el){
+    var key = el.getAttribute('data-media');
+    var field = getPath(data, key);
+    if(!field) return;
+    mediaUrl(field, function(u){
+      if(!u) return;
+      if(el.tagName === 'IMG') el.src = u;
+      else if(el.tagName === 'AUDIO') el.src = u;
+      else el.style.backgroundImage = 'url(' + u + ')';
+    });
+  });
+}
+function getPath(obj, path){
+  var parts = String(path).split('.');
+  var cur = obj;
+  for(var i=0;i<parts.length;i++){ if(cur == null) return null; cur = cur[parts[i]]; }
+  return cur;
+}
+function setPath(obj, path, val){
+  var parts = String(path).split('.');
+  var cur = obj;
+  for(var i=0;i<parts.length-1;i++){ if(cur[parts[i]] == null) cur[parts[i]] = {}; cur = cur[parts[i]]; }
+  cur[parts[parts.length-1]] = val;
+}
+
+/* ================= 渲染：访客端 ================= */
+function renderAll(){
+  document.title = (data.home && data.home.title ? data.home.title + ' · ' : '') + '为你的 OC 定制一首歌';
+  renderNav(); renderHome(); renderBiz(); renderAudio(); renderAbout(); renderFooter();
+}
+
+function renderNav(){
+  var views = [['home','首页'],['business','其他业务'],['audio','音频试听'],['about','关于我']];
+  var html = views.map(function(v){
+    return '<a href="#'+v[0]+'" data-view="'+v[0]+'">'+v[1]+'</a>';
+  }).join('');
+  document.getElementById('nav').innerHTML = html;
+  document.getElementById('drawer').innerHTML = html;
+  document.querySelectorAll('#nav a, #drawer a').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); switchView(a.getAttribute('data-view')); });
+  });
+}
+
+function renderHome(){
+  var h = data.home;
+  var tags = (h.tags||[]).map(function(t){ return '<span>'+esc(t)+'</span>'; }).join('');
+  document.getElementById('homeWrap').innerHTML =
+    '<div class="hero-cn">' +
+      '<div class="dot"></div>' +
+      '<h1>'+esc(h.title)+'</h1>' +
+      '<p class="sub">'+esc(h.sub)+'</p>' +
+      '<div class="rule"></div>' +
+      '<p class="intro">'+h.intro+'</p>' +
+      '<div class="cta-row">' +
+        '<button class="cta solid" data-goto="business">'+esc(h.cta1)+'</button>' +
+        '<button class="cta" data-goto="audio">'+esc(h.cta2)+'</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="tate" aria-hidden="true">'+esc(h.tate)+'<span class="t-accent">・</span></div>' +
+    '<div class="home-tags">'+tags+'</div>';
+  document.querySelectorAll('#homeWrap [data-goto]').forEach(function(b){
+    b.addEventListener('click', function(){ switchView(b.getAttribute('data-goto')); });
+  });
+}
+
+function renderBiz(){
+  var b = data.biz;
+  var styleHtml = (b.styleTags||[]).map(function(t){
+    return '<b>'+esc(t.name)+'</b>'+(t.desc ? '（'+esc(t.desc)+'）' : '');
+  }).join('・');
+  var cats = b.categories.map(function(c, ci){
+    var items = c.items.map(function(it){
+      return '<li><span class="biz-name">'+esc(it.name)+'</span>' +
+        '<span class="biz-price">'+esc(it.price)+'</span>' +
+        '<span class="biz-meta">'+esc(it.meta)+'</span></li>';
+    }).join('');
+    var note = '';
+    if(c.note) note += '<p class="note">'+esc(c.note)+'</p>';
+    if(ci === 0 && styleHtml) note += '<p class="note">风格参考：'+styleHtml+'</p>';
+    var audio = c.audioText ? '<button class="biz-audio" data-goto="audio">'+esc(c.audioText)+'</button>' : '';
+    return '<div class="biz">' +
+      '<div class="biz-head"><span class="num">'+esc(c.num)+'</span><h3>'+esc(c.name)+'</h3></div>' +
+      '<p class="desc">'+esc(c.desc)+'</p>' +
+      '<ul class="biz-list">'+items+'</ul>' +
+      note + audio +
+    '</div>';
+  }).join('');
+  document.getElementById('bizWrap').innerHTML =
+    '<div class="page-head"><h2>其他业务</h2><div class="en">SERVICES &amp; PRICE</div><div class="rule"></div></div>' +
+    '<div class="wrap-inner">'+cats+'</div>';
+  document.querySelectorAll('#bizWrap [data-goto]').forEach(function(b){
+    b.addEventListener('click', function(){ switchView(b.getAttribute('data-goto')); });
+  });
+}
+
+function renderAudio(){
+  var tracks = data.audio || [];
+  var rows = tracks.map(function(t, i){
+    var has = !!t.media;
+    return '<li>' +
+      '<div><div class="audio-name">'+esc(t.name)+'</div><div class="audio-cat">'+esc(t.cat)+'</div></div>' +
+      (has
+        ? '<button class="audio-play" data-i="'+i+'" aria-label="播放"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>'
+        : '<span class="soon-tag" style="font-family:var(--sans);font-size:11px;letter-spacing:.15em;color:var(--ink4)">整理中</span>')
+    + '</li>';
+  }).join('');
+  document.getElementById('audioWrap').innerHTML =
+    '<div class="page-head"><h2>音频试听</h2><div class="en">LISTEN</div><div class="rule"></div></div>' +
+    '<div class="player" id="player">' +
+      '<button class="p-btn" id="playBtn" aria-label="播放"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
+      '<div class="p-info"><div class="p-title" id="pTitle">待播放</div><div class="p-sub" id="pSub">从下方列表选择曲目</div></div>' +
+      '<span class="p-time" id="pTime">00:00 / 00:00</span>' +
+      '<div class="p-bar" id="pBar"><div class="fill" id="pFill"></div><div class="knob" id="pKnob"></div></div>' +
+    '</div>' +
+    '<ul class="audio-list">'+rows+'</ul>' +
+    (tracks.length ? '' : '<p class="soon">还没有曲目，去编辑后台上传吧。</p>');
+  bindPlayer();
+  fillMedia(document.getElementById('audioWrap'));
+}
+
+/* 播放器 */
+var curAudio = null, curTrack = null;
+function bindPlayer(){
+  var pBtn = document.getElementById('playBtn');
+  var pBar = document.getElementById('pBar');
+  var pFill = document.getElementById('pFill');
+  var pTime = document.getElementById('pTime');
+  var pTitle = document.getElementById('pTitle');
+  var pSub = document.getElementById('pSub');
+  function fmt(s){ s = Math.floor(s||0); var m=Math.floor(s/60), ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+  function update(){
+    if(!curAudio || !curAudio.duration){ pFill.style.width='0%'; pTime.textContent='00:00 / 00:00'; return; }
+    var p = curAudio.currentTime / curAudio.duration;
+    pFill.style.width = (p*100)+'%';
+    pTime.textContent = fmt(curAudio.currentTime) + ' / ' + fmt(curAudio.duration);
+  }
+  function stop(){
+    if(curAudio){ curAudio.pause(); curAudio.onended = null; curAudio.ontimeupdate = null; }
+  }
+  pBtn.addEventListener('click', function(){
+    if(!curTrack || !curTrack.media){ toast('先在下方列表选择一首曲目'); return; }
+    if(curAudio && !curAudio.paused){ curAudio.pause(); return; }
+    if(curAudio){ curAudio.play(); return; }
+    playByIndex(tracksIndexOf(curTrack));
+  });
+  pBar.addEventListener('click', function(e){
+    if(!curAudio || !curAudio.duration) return;
+    var rect = pBar.getBoundingClientRect();
+    var p = (e.clientX - rect.left) / rect.width;
+    curAudio.currentTime = p * curAudio.duration;
+  });
+  document.querySelectorAll('#audioWrap .audio-play').forEach(function(b){
+    b.addEventListener('click', function(){
+      var i = +b.getAttribute('data-i');
+      if(curAudio && curAudio.dataset && curAudio.dataset.i == i && !curAudio.paused){ curAudio.pause(); return; }
+      playByIndex(i);
+    });
+  });
+  var tracksIndexOf = function(t){ return (data.audio||[]).indexOf(t); };
+  function playByIndex(i){
+    var t = (data.audio||[])[i];
+    if(!t || !t.media){ toast('这首还没上传音频'); return; }
+    stop();
+    mediaUrl(t.media, function(u){
+      if(!u){ toast('音频文件读取失败'); return; }
+      curTrack = t;
+      var a = new Audio(u);
+      a.dataset.i = i;
+      a.ontimeupdate = update;
+      a.onended = function(){ pBtn.querySelector('svg').style.opacity='1'; };
+      a.play();
+      curAudio = a;
+      pTitle.textContent = t.name;
+      pSub.textContent = t.cat;
+      update();
+    });
+  }
+}
+
+function renderAbout(){
+  var a = data.about;
+  var panels = [
+    ['works','作品集', renderWorksPanel(a.works)],
+    ['oc','OC', renderOcPanel(a.oc)],
+    ['resume','履历', '<div class="body">'+esc(a.resume)+'</div>'],
+    ['contact','联系方式', renderContactPanel(a.contact)]
+  ];
+  var tabs = panels.map(function(p, i){
+    return '<button data-tab="'+p[0]+'"'+(i===0?' class="active"':'')+'>'+p[1]+'</button>';
+  }).join('');
+  var bodies = panels.map(function(p, i){
+    return '<div class="about-panel' + (i===0 ? ' active' : '') + '" data-panel="'+p[0]+'">'+p[2]+'</div>';
+  }).join('');
+  document.getElementById('aboutWrap').innerHTML =
+    '<div class="page-head"><h2>关于我</h2><div class="en">ABOUT</div><div class="rule"></div></div>' +
+    '<div class="about-tabs">'+tabs+'</div>' + bodies;
+  document.querySelectorAll('#aboutWrap .about-tabs button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#aboutWrap .about-tabs button').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      var tab = b.getAttribute('data-tab');
+      document.querySelectorAll('#aboutWrap .about-panel').forEach(function(p){
+        p.classList.toggle('active', p.getAttribute('data-panel') === tab);
+      });
+    });
+  });
+  fillMedia(document.getElementById('aboutWrap'));
+}
+
+function renderWorksPanel(works){
+  if(!works || !works.length) return '<div class="body"><span class="ph" style="font-family:var(--sans);letter-spacing:.12em;color:var(--ink4)">作品整理中 —— 简易小曲 demo、翻唱、混音案例、未发布原创（带水印）将在此集中展示。</span></div>';
+  var cards = works.map(function(w){
+    var cover;
+    if(w.media){
+      cover = '<div class="pf-cover" data-media="' + 'about.works.' + works.indexOf(w) + '.media' + '" style="background-size:cover"></div>';
+    } else {
+      cover = '<div class="pf-cover"><div class="pf-text">' + esc(w.coverText || w.title || '') + '</div></div>';
+    }
+    return '<div class="pf-card">' + cover + '<div class="pf-name">' + esc(w.title) + '</div></div>';
+  }).join('');
+  return '<div class="body">作品集中散货，全部作品都在这里。</div><div class="pf-grid">'+cards+'</div>';
+}
+
+function renderOcPanel(oc){
+  var cover = oc && oc.cover
+    ? '<div class="oc-cover" data-media="about.oc.cover"></div>'
+    : '<div class="oc-cover"><div class="oc-place">OC 封面 · 待上传</div></div>';
+  return cover + '<div class="md-body">'+mdToHtml((oc && oc.md) || '')+'</div>';
+}
+
+function renderContactPanel(contact){
+  var list = (contact||[]).map(function(c){
+    var qr = c.qr
+      ? '<div class="qr"><img data-media="' + 'about.contact.' + contact.indexOf(c) + '.qr' + '" alt=""></div>'
+      : '<div class="qr"><div class="qr-none">二维码待传</div></div>';
+    return '<div class="contact-card">'+qr+'<div class="c-name">'+esc(c.name)+'</div>'+
+      (c.desc?'<div class="c-desc">'+esc(c.desc)+'</div>':'')+'</div>';
+  }).join('');
+  return '<div class="body">约稿与沟通走平台账号，所有交易走平台担保。不放个人二维码与邮箱。</div>' +
+    '<div class="contact-grid">'+list+'</div>';
+}
+
+function renderFooter(){
+  var f = data.footer || {};
+  var admin = EDIT_DISABLED ? '' : '<button class="admin-btn" id="adminBtn">管理</button>';
+  document.getElementById('footerEl').innerHTML =
+    '<div>' + esc(f.copyright||'') + ' · ' + esc(f.watermark||'') + '</div>' +
+    '<div style="display:flex;gap:12px;align-items:center">' + admin +
+    '<button class="to-top" id="toTop">返回顶部</button></div>';
+  var tt = document.getElementById('toTop');
+  if(tt) tt.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  var ab = document.getElementById('adminBtn');
+  if(ab) ab.addEventListener('click', function(){ switchView('edit'); });
+}
+
+/* ================= 路由 ================= */
+var views = ['home','business','audio','about','edit'];
+function switchView(name){
+  if(views.indexOf(name) === -1) name = 'home';
+  views.forEach(function(v){
+    var el = document.getElementById('view-' + v);
+    var navLink = document.querySelector('#nav a[data-view="' + v + '"]');
+    var drawerLink = document.querySelector('#drawer a[data-view="' + v + '"]');
+    if(v === name){
+      el.classList.add('active');
+      if(navLink) navLink.classList.add('active');
+      if(drawerLink) drawerLink.classList.add('active');
+    } else {
+      el.classList.remove('active');
+      if(navLink) navLink.classList.remove('active');
+      if(drawerLink) drawerLink.classList.remove('active');
+    }
+  });
+  closeDrawer();
+  if(!location.hash || location.hash !== '#' + name){
+    try{ history.replaceState(null,'','#' + name); }catch(e){}
+  }
+  window.scrollTo({top:0,behavior:'auto'});
+  if(name === 'edit') openEdit();
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('menuBtn').classList.remove('open');
+}
+
+/* ================= Markdown 渲染（Obsidian 风） ================= */
+function mdToHtml(src){
+  if(!src) return '';
+  var lines = String(src).replace(/\r\n/g,'\n').split('\n');
+  var out = [], inCode = false, codeBuf = [], listType = null;
+  function inline(s){
+    var t = esc(s);
+    t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    t = t.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+    t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+    return t;
+  }
+  function closeList(){ if(listType){ out.push(listType === 'ul' ? '</ul>' : '</ol>'); listType = null; } }
+  lines.forEach(function(line){
+    var trimmed = line.trim();
+    if(trimmed.indexOf('```') === 0){
+      if(inCode){ out.push('<pre><code>' + esc(codeBuf.join('\n')) + '</code></pre>'); codeBuf = []; inCode = false; }
+      else { closeList(); inCode = true; }
+      return;
+    }
+    if(inCode){ codeBuf.push(line); return; }
+    if(!trimmed){ closeList(); return; }
+    if(/^#{1,6}\s/.test(trimmed)){
+      closeList();
+      var level = trimmed.match(/^#+/)[0].length;
+      var tag = level <= 1 ? 'h1' : (level === 2 ? 'h2' : 'h3');
+      out.push('<' + tag + '>' + inline(trimmed.replace(/^#+\s*/,'')) + '</' + tag + '>');
+      return;
+    }
+    if(/^>\s?/.test(trimmed)){
+      closeList();
+      out.push('<blockquote>' + inline(trimmed.replace(/^>\s?/,'')) + '</blockquote>');
+      return;
+    }
+    if(/^---+$/.test(trimmed)){ closeList(); out.push('<hr>'); return; }
+    if(/^[-*]\s+/.test(trimmed)){
+      if(listType !== 'ul'){ closeList(); out.push('<ul>'); listType = 'ul'; }
+      out.push('<li>' + inline(trimmed.replace(/^[-*]\s+/,'')) + '</li>');
+      return;
+    }
+    if(/^\d+\.\s+/.test(trimmed)){
+      if(listType !== 'ol'){ closeList(); out.push('<ol>'); listType = 'ol'; }
+      out.push('<li>' + inline(trimmed.replace(/^\d+\.\s+/,'')) + '</li>');
+      return;
+    }
+    closeList();
+    out.push('<p>' + inline(trimmed) + '</p>');
+  });
+  closeList();
+  if(inCode) out.push('<pre><code>' + esc(codeBuf.join('\n')) + '</code></pre>');
+  return out.join('\n');
+}
+
+/* ================= 编辑后台 ================= */
+var draft = null;
+
+function openEdit(){
+  if(EDIT_DISABLED){ switchView('home'); toast('这是发布版页面，编辑请在母版文件上操作'); return; }
+  if(sessionStorage.getItem(AUTH_SESS) === '1'){
+    draft = JSON.parse(JSON.stringify(data));
+    buildEditor();
+    return;
+  }
+  showLock();
+}
+
+function showLock(){
+  var lock = document.getElementById('editLock');
+  var hasPass = !!localStorage.getItem(PASS_KEY);
+  lock.classList.remove('hidden');
+  lock.innerHTML =
+    '<div class="lk-box">' +
+    '<h3>' + (hasPass ? '输入管理密码' : '设置管理密码') + '</h3>' +
+    '<p>' + (hasPass ? '仅本人可用。密码只存在这台电脑的浏览器里。' : '首次使用：设一个只有你知道的密码（存在本机浏览器）。') + '</p>' +
+    (hasPass
+      ? '<input type="password" id="lkPass" placeholder="密码">'
+      : '<input type="password" id="lkPass" placeholder="新密码"><input type="password" id="lkPass2" placeholder="再输一遍">') +
+    '<button class="lk-btn" id="lkGo">' + (hasPass ? '进入' : '设置并进入') + '</button>' +
+    '</div>';
+  var go = document.getElementById('lkGo');
+  function submit(){
+    var p1 = document.getElementById('lkPass').value;
+    if(hasPass){
+      if(p1 === localStorage.getItem(PASS_KEY)){
+        sessionStorage.setItem(AUTH_SESS,'1');
+        lock.classList.add('hidden');
+        draft = JSON.parse(JSON.stringify(data));
+        buildEditor();
+      } else toast('密码不对');
+    } else {
+      var p2 = document.getElementById('lkPass2').value;
+      if(!p1 || p1 !== p2){ toast('两次输入不一致'); return; }
+      localStorage.setItem(PASS_KEY, p1);
+      sessionStorage.setItem(AUTH_SESS,'1');
+      lock.classList.add('hidden');
+      draft = JSON.parse(JSON.stringify(data));
+      buildEditor();
+    }
+  }
+  go.addEventListener('click', submit);
+  var box = lock.querySelector('.lk-box');
+  box.addEventListener('keydown', function(e){ if(e.key === 'Enter') submit(); });
+}
+
+/* 编辑表单辅助 */
+function edRow(label, html){ return '<div class="ed-row"><label>' + label + '</label>' + html + '</div>'; }
+function edText(path, label){
+  return edRow(label, '<input type="text" data-path="' + path + '" value="' + esc(getPath(draft,path)) + '">');
+}
+function edArea(path, label, rows){
+  return edRow(label, '<textarea data-path="' + path + '" rows="' + (rows||6) + '">' + esc(getPath(draft,path) || '') + '</textarea>');
+}
+function fileHtml(path, kind){
+  return '<span class="ed-file"><input type="file" accept="' + (kind==='image' ? 'image/*' : 'audio/*') + '" data-upload="' + path + '">' +
+    '<img class="thumb" data-media="' + path + '" style="display:none"></span>';
+}
+
+function buildEditor(){
+  var root = document.getElementById('editRoot');
+  var html = '';
+  html += '<div class="ed-wrap"><div class="ed-head"><h2>编辑后台</h2><div class="ed-actions">' +
+    '<button class="ed-btn solid" data-act="save">保存并更新前台</button>' +
+    '<button class="ed-btn" data-act="export">导出网站</button>' +
+    '<button class="ed-btn" data-act="reset">恢复默认</button>' +
+    '<button class="ed-btn" data-act="preview">看前台</button>' +
+    '</div></div>';
+  html += '<p class="ed-hint-tip">改完点「保存并更新前台」本机立即生效；要发布给访客，点「导出网站」下载 HTML 替换网站文件（或上传到托管平台）。图、音频、二维码都直接在这里选文件上传。</p>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">首页文案<span class="hint">全部可改</span></div><div class="ed-body">';
+  html += edText('home.title','大标题（站名）');
+  html += edText('home.sub','副标题');
+  html += edArea('home.intro','自我介绍（支持 &lt;br&gt; 换行）',8);
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' + edText('home.cta1','按钮①文字') + edText('home.cta2','按钮②文字') + '</div>';
+  html += edText('home.tate','右侧竖排装饰文字');
+  html += edText('home.tags','首页标签（中文逗号分隔，如：编曲,演唱,混音）');
+  html += '</div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">授权乘数与风格标签<span class="hint">你自己编辑</span></div><div class="ed-body">';
+  html += edText('biz.multipliers','授权乘数文案');
+  html += '<div class="ed-row"><label>风格标签（打 tag）</label><div id="tagList"></div><button class="ed-add" data-add="tag">+ 添加标签</button></div>';
+  html += '</div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">业务与价目<span class="hint">增删条目、改价格/工期/备注</span></div><div class="ed-body"><div id="catList"></div><button class="ed-add" data-add="cat">+ 添加业务大类</button></div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">音频试听<span class="hint">你自己上传</span></div><div class="ed-body"><div id="audList"></div><button class="ed-add" data-add="audio">+ 添加曲目</button></div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">关于我 · 作品集<span class="hint">封面可传图或写文字</span></div><div class="ed-body"><div id="workList"></div><button class="ed-add" data-add="work">+ 添加作品</button></div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">关于我 · OC 档案<span class="hint">导入 .md 或粘贴 Markdown</span></div><div class="ed-body">';
+  html += '<div class="ed-row"><label>OC 封面背景（网易云个人主页式，仅 OC 板块用）</label>' + fileHtml('about.oc.cover','image') + '</div>';
+  html += '<div class="ed-row"><label>OC 设定档案（支持 # 标题 / - 列表 / &gt; 引用 / **加粗** / ``` 代码块）</label>' +
+    '<input type="file" accept=".md,text/markdown,text/plain" id="mdFile" style="font-family:var(--sans);font-size:12px;margin-bottom:8px">' +
+    '<textarea data-path="about.oc.md" rows="12">' + esc((draft.about.oc && draft.about.oc.md) || '') + '</textarea></div>';
+  html += '</div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">关于我 · 履历<span class="hint">给甲方看的实力说明</span></div><div class="ed-body">';
+  html += edArea('about.resume','履历内容',6);
+  html += '</div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">关于我 · 联系方式<span class="hint">传二维码 + 写平台名，卡片窗口自动排布</span></div><div class="ed-body"><div id="conList"></div><button class="ed-add" data-add="contact">+ 添加平台</button></div></div>';
+
+  html += '<div class="ed-panel"><div class="ed-p-title">页脚<span class="hint">版权与声音水印说明</span></div><div class="ed-body">';
+  html += edText('footer.copyright','版权文字');
+  html += edArea('footer.watermark','声音水印说明',3);
+  html += '</div></div>';
+
+  html += '</div>';
+  root.innerHTML = html;
+
+  /* 文本编辑（委托） */
+  root.addEventListener('input', function(e){
+    var el = e.target, p = el.getAttribute && el.getAttribute('data-path');
+    if(p) setPath(draft, p, el.value);
+  });
+
+  /* 文件上传（委托） */
+  root.addEventListener('change', function(e){
+    var t = e.target;
+    if(t.getAttribute && t.getAttribute('data-upload')){
+      var f = t.files[0];
+      if(!f) return;
+      var p = t.getAttribute('data-upload');
+      var prev = t.parentNode.querySelector('img.thumb');
+      if(prev){ prev.src = URL.createObjectURL(f); prev.style.display = 'block'; }
+      putMedia(f, function(id){ if(id) setPath(draft, p, {id:id}); });
+      return;
+    }
+    var sp = t.getAttribute && t.getAttribute('data-path');
+    if(sp && t.tagName === 'SELECT'){ setPath(draft, sp, t.value); renderWorkList(); }
+  });
+
+  /* MD 导入 */
+  var mdFile = document.getElementById('mdFile');
+  if(mdFile) mdFile.addEventListener('change', function(){
+    var f = mdFile.files[0];
+    if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      setPath(draft, 'about.oc.md', r.result);
+      var ta = document.querySelector('[data-path="about.oc.md"]');
+      if(ta) ta.value = r.result;
+      toast('已导入 ' + f.name + '，可继续编辑');
+    };
+    r.readAsText(f);
+  });
+
+  /* 操作按钮（委托） */
+  root.addEventListener('click', function(e){
+    var t = e.target;
+    var act = t.getAttribute && t.getAttribute('data-act');
+    var add = t.getAttribute && t.getAttribute('data-add');
+    var del = t.getAttribute && t.getAttribute('data-del');
+    var ci = t.getAttribute && t.getAttribute('data-ci');
+    if(act === 'save'){
+      saveData(draft); data = draft; renderAll();
+      toast('已保存，前台已更新');
+    }
+    else if(act === 'export') exportSite();
+    else if(act === 'reset'){ if(confirm('恢复默认会清空所有编辑内容，确定？')) resetData(); }
+    else if(act === 'preview') switchView('home');
+    else if(add === 'tag'){ draft.biz.styleTags.push({name:'新标签',desc:''}); renderTagList(); }
+    else if(add === 'cat'){ draft.biz.categories.push({num:'0' + (draft.biz.categories.length+1), name:'新大类', desc:'', note:'', audioText:'', items:[{name:'服务项', price:'价格', meta:'说明'}]}); renderCatList(); }
+    else if(add === 'item'){ var catArr = getPath(draft, 'biz.categories'); if(catArr && ci != null) catArr[+ci].items.push({name:'新服务', price:'价格', meta:''}); renderCatList(); }
+    else if(add === 'audio'){ draft.audio.push({name:'新曲目', cat:'分类', media:null}); renderAudList(); }
+    else if(add === 'work'){ draft.about.works.push({title:'新作品', coverType:'text', coverText:'作品名', media:null}); renderWorkList(); }
+    else if(add === 'contact'){ draft.about.contact.push({name:'新平台', desc:'', qr:null}); renderConList(); }
+    else if(del){
+      var parts = String(del).split('|');
+      var arr = getPath(draft, parts[0]);
+      if(arr && arr.length) arr.splice(+parts[1], 1);
+      refreshEdLists();
+    }
+  });
+
+  renderTagList(); renderCatList(); renderAudList(); renderWorkList(); renderConList();
+  fillMedia(root);
+}
+
+function refreshEdLists(){
+  renderTagList(); renderCatList(); renderAudList(); renderWorkList(); renderConList();
+  fillMedia(document.getElementById('editRoot'));
+}
+
+function renderTagList(){
+  var box = document.getElementById('tagList');
+  if(!box) return;
+  var tags = draft.biz.styleTags || [];
+  box.innerHTML = tags.map(function(t,i){
+    return '<div class="ed-item">' +
+      '<div class="ed-row"><input type="text" data-path="biz.styleTags.' + i + '.name" value="' + esc(t.name) + '" placeholder="标签名"></div>' +
+      '<div class="ed-row"><input type="text" data-path="biz.styleTags.' + i + '.desc" value="' + esc(t.desc||'') + '" placeholder="说明（可空）"></div>' +
+      '<div class="ed-item-actions"><button class="ed-del" data-del="biz.styleTags|' + i + '">删除</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderCatList(){
+  var box = document.getElementById('catList');
+  if(!box) return;
+  var cats = draft.biz.categories || [];
+  box.innerHTML = cats.map(function(c,ci){
+    var itemsHtml = (c.items||[]).map(function(it,ii){
+      return '<div class="ed-item">' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.items.' + ii + '.name" value="' + esc(it.name) + '" placeholder="服务名"></div>' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.items.' + ii + '.price" value="' + esc(it.price) + '" placeholder="价格"></div>' +
+        '<div class="ed-row"><textarea data-path="biz.categories.' + ci + '.items.' + ii + '.meta" rows="2">' + esc(it.meta) + '</textarea></div>' +
+        '<div class="ed-item-actions"><button class="ed-del" data-del="biz.categories.' + ci + '.items|' + ii + '">删除</button></div>' +
+      '</div>';
+    }).join('');
+    return '<div class="ed-item">' +
+      '<div style="display:grid;grid-template-columns:44px 1fr 1fr;gap:8px">' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.num" value="' + esc(c.num) + '" placeholder="01"></div>' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.name" value="' + esc(c.name) + '" placeholder="大类名"></div>' +
+        '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.audioText" value="' + esc(c.audioText||'') + '" placeholder="试听按钮文字（可空）"></div>' +
+      '</div>' +
+      '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.desc" value="' + esc(c.desc) + '" placeholder="一句话描述"></div>' +
+      '<div class="ed-row"><input type="text" data-path="biz.categories.' + ci + '.note" value="' + esc(c.note||'') + '" placeholder="底部备注（可空）"></div>' +
+      itemsHtml +
+      '<button class="ed-add" data-add="item" data-ci="' + ci + '">+ 添加服务项</button>' +
+      '<div class="ed-item-actions"><button class="ed-del" data-del="biz.categories|' + ci + '">删除整个大类</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderAudList(){
+  var box = document.getElementById('audList');
+  if(!box) return;
+  box.innerHTML = draft.audio.map(function(t,i){
+    return '<div class="ed-item">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+        '<div class="ed-row"><input type="text" data-path="audio.' + i + '.name" value="' + esc(t.name) + '" placeholder="曲名"></div>' +
+        '<div class="ed-row"><input type="text" data-path="audio.' + i + '.cat" value="' + esc(t.cat) + '" placeholder="分类"></div>' +
+      '</div>' +
+      '<div class="ed-row"><label>音频文件（mp3 等，直接上传）</label>' + fileHtml('audio.' + i + '.media','audio') + '</div>' +
+      '<div class="ed-item-actions"><button class="ed-del" data-del="audio|' + i + '">删除</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderWorkList(){
+  var box = document.getElementById('workList');
+  if(!box) return;
+  box.innerHTML = draft.about.works.map(function(w,i){
+    var sel = '<select data-path="about.works.' + i + '.coverType">' +
+      '<option value="text"' + (w.coverType==='text' ? ' selected' : '') + '>文字封面</option>' +
+      '<option value="img"' + (w.coverType==='img' ? ' selected' : '') + '>图片封面</option></select>';
+    var coverFields = (w.coverType === 'img')
+      ? '<div class="ed-row"><label>封面图</label>' + fileHtml('about.works.' + i + '.media','image') + '</div>'
+      : '<div class="ed-row"><input type="text" data-path="about.works.' + i + '.coverText" value="' + esc(w.coverText||'') + '" placeholder="封面大字（无图时显示）"></div>';
+    return '<div class="ed-item">' +
+      '<div class="ed-row"><input type="text" data-path="about.works.' + i + '.title" value="' + esc(w.title) + '" placeholder="作品名"></div>' +
+      '<div class="ed-row"><label>封面类型</label>' + sel + '</div>' + coverFields +
+      '<div class="ed-item-actions"><button class="ed-del" data-del="about.works|' + i + '">删除</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderConList(){
+  var box = document.getElementById('conList');
+  if(!box) return;
+  box.innerHTML = draft.about.contact.map(function(c,i){
+    return '<div class="ed-item">' +
+      '<div class="ed-row"><input type="text" data-path="about.contact.' + i + '.name" value="' + esc(c.name) + '" placeholder="平台名（如 小红书）"></div>' +
+      '<div class="ed-row"><label>二维码图</label>' + fileHtml('about.contact.' + i + '.qr','image') + '</div>' +
+      '<div class="ed-row"><input type="text" data-path="about.contact.' + i + '.desc" value="' + esc(c.desc||'') + '" placeholder="一句话说明（可空）"></div>' +
+      '<div class="ed-item-actions"><button class="ed-del" data-del="about.contact|' + i + '">删除</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ================= 导出网站（自包含发布版） ================= */
+function exportSite(){
+  toast('正在打包素材，稍等…');
+  var ex = JSON.parse(JSON.stringify(draft));
+  var tasks = [];
+  (function collect(o){
+    Object.keys(o).forEach(function(k){
+      var v = o[k];
+      if(v && typeof v === 'object'){
+        if(typeof v.id === 'string') tasks.push(v);
+        else collect(v);
+      }
+    });
+  })(ex);
+  var done = 0, total = tasks.length;
+  function finish(ed){
+    var json = JSON.stringify(ed).replace(/<\//g, '<\\/');
+    var mainSrc = document.querySelector('script[data-main]').textContent;
+    var clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.view').forEach(function(v){ while(v.firstChild) v.removeChild(v.firstChild); });
+    var footerC = clone.getElementById('footerEl');
+    if(footerC) footerC.textContent = '';
+    var lockC = clone.getElementById('editLock');
+    if(lockC) lockC.textContent = '';
+    var toastC = clone.getElementById('toast');
+    if(toastC) toastC.textContent = '';
+    var scr = clone.querySelector('script[data-main]');
+    var ns = document.createElement('script');
+    ns.setAttribute('data-main','');
+    ns.textContent = 'window.__INITIAL_DATA=' + json + ';window.__EDIT_DISABLED=true;' + mainSrc;
+    scr.parentNode.replaceChild(ns, scr);
+    var out = '<!DOCTYPE html>\n' + clone.outerHTML;
+    var blob = new Blob([out], {type:'text/html;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'xishu-home.html';
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+    toast('已导出 xishu-home.html —— 用它替换网站文件即可发布');
+  }
+  if(!total) return finish(ex);
+  tasks.forEach(function(field){
+    getMediaDataUrl(field.id, function(durl){
+      done++;
+      field.dataUrl = durl; delete field.id;
+      if(done === total) finish(ex);
+    });
+  });
+}
+
+/* ================= 启动 ================= */
+var data = loadData();
+renderAll();
+
+var menuBtn = document.getElementById('menuBtn');
+menuBtn.addEventListener('click', function(){
+  var open = document.getElementById('drawer').classList.toggle('open');
+  menuBtn.classList.toggle('open', open);
+});
+document.getElementById('logoBtn').addEventListener('click', function(){ switchView('home'); });
+
+var initial = (location.hash || '').replace('#','');
+switchView(initial || 'home');
+})();
+</script>
+</body>
+</html>
